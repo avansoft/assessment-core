@@ -68,6 +68,6 @@ public class GetAttributeScoreDetailService implements GetAttributeScoreDetailUs
         return new Result(
             new Result.Questionnaire(item.questionnaireId(), item.questionnaireTitle()),
             new Result.Question(item.questionId(), item.questionIndex(), item.questionTitle(), item.questionWeight(), item.evidenceCount()),
-            new Result.Answer(item.optionIndex(), item.optionTitle(), item.answerIsNotApplicable(), item.answerScore(), item.weightedScore(), item.confidence()));
+            new Result.Answer(item.optionIndex(), item.optionTitle(), item.answerIsNotApplicable(), item.gainedScore(), item.missedScore(), item.confidence()));
     }
 }

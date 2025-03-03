@@ -27,8 +27,8 @@ public interface LoadAttributeScoreDetailPort {
                   Integer optionIndex,
                   String optionTitle,
                   Boolean answerIsNotApplicable,
-                  Double answerScore,
-                  Double weightedScore,
+                  Double gainedScore,
+                  Double missedScore,
                   Integer confidence,
                   int evidenceCount) {
     }

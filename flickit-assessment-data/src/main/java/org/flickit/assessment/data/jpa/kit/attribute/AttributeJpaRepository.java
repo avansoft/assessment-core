@@ -79,7 +79,11 @@ public interface AttributeJpaRepository extends JpaRepository<AttributeJpaEntity
                 CASE
                     WHEN ans.isNotApplicable = true THEN NULL
                     ELSE COALESCE(ao.value, 0.0) * qi.weight
-                END as weightedScore,
+                END as gainedScore,
+                CASE
+                    WHEN ans.isNotApplicable = true THEN NULL
+                    ELSE qi.weight - COALESCE(ao.value, 0.0) * qi.weight
+                END as missedScore,
                 COUNT(e.id) as evidenceCount
             FROM QuestionJpaEntity qsn
             LEFT JOIN AnswerJpaEntity ans on ans.questionId = qsn.id and ans.assessmentResult.id = :assessmentResultId

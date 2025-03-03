@@ -23,9 +23,9 @@ public interface ImpactFullQuestionsView {
 
     String getOptionTitle();
 
-    Double getAnswerScore();
+    Double getGainedScore();
 
-    Double getWeightedScore();
+    Double getMissedScore();
 
     int getEvidenceCount();
 }

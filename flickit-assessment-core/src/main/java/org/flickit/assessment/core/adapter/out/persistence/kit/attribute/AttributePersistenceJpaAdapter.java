@@ -69,8 +69,8 @@ public class AttributePersistenceJpaAdapter implements
                 view.getOptionIndex(),
                 view.getOptionTitle(),
                 view.getAnswer() == null ? null : view.getAnswer().getIsNotApplicable(),
-                view.getAnswerScore(),
-                view.getWeightedScore(),
+                view.getGainedScore(),
+                view.getMissedScore(),
                 view.getAnswer() != null && view.getAnswer().getConfidenceLevelId() != null ? view.getAnswer().getConfidenceLevelId() : null,
                 view.getEvidenceCount()))
             .toList();
@@ -96,8 +96,8 @@ public class AttributePersistenceJpaAdapter implements
             case GetAttributeScoreDetailUseCase.Param.Sort.WEIGHT -> "qi." + QuestionImpactJpaEntity.Fields.weight;
             case GetAttributeScoreDetailUseCase.Param.Sort.CONFIDENCE ->
                 "ans." + AnswerJpaEntity.Fields.confidenceLevelId;
-            case GetAttributeScoreDetailUseCase.Param.Sort.WEIGHTED_SCORE -> "weightedScore";
-            case GetAttributeScoreDetailUseCase.Param.Sort.SCORE -> "answerScore";
+            case GetAttributeScoreDetailUseCase.Param.Sort.GAINED_SCORE -> "gainedScore";
+            case GetAttributeScoreDetailUseCase.Param.Sort.MISSED_SCORE -> "missedScore";
             case GetAttributeScoreDetailUseCase.Param.Sort.EVIDENCE_COUNT -> "evidenceCount";
         };
 

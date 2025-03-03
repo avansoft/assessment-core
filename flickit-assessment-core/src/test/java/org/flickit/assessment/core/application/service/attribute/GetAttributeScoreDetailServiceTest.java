@@ -121,8 +121,8 @@ class GetAttributeScoreDetailServiceTest {
             2,
             "Yes",
             false,
-            score,
             weight * score,
+            score,
             1,
             2);
     }
@@ -138,8 +138,8 @@ class GetAttributeScoreDetailServiceTest {
             null,
             null,
             false,
-            null,
             0.0,
+            null,
             1,
             3);
     }
@@ -155,8 +155,8 @@ class GetAttributeScoreDetailServiceTest {
             null,
             null,
             true,
-            null,
             0.0,
+            null,
             1,
             0);
     }

@@ -38,8 +38,8 @@ class GetAttributeScoreDetailUseCaseTest {
         assertThat(throwable).hasMessage("sort: " + GET_ATTRIBUTE_SCORE_DETAIL_SORT_INVALID);
 
         assertDoesNotThrow(() -> createParam(b -> b.sort("    weight     ")));
-        assertDoesNotThrow(() -> createParam(b -> b.sort("    SCORE     ")));
-        assertDoesNotThrow(() -> createParam(b -> b.sort("    weighted_Score     ")));
+        assertDoesNotThrow(() -> createParam(b -> b.sort("    MISSED_SCORE     ")));
+        assertDoesNotThrow(() -> createParam(b -> b.sort("    missed_Score     ")));
         assertDoesNotThrow(() -> createParam(b -> b.sort("    confIDence     ")));
         assertDoesNotThrow(() -> createParam(b -> b.sort("    eviDence_CounT     ")));
         var params = assertDoesNotThrow(() -> createParam(b -> b.sort(null)));
@@ -87,8 +87,8 @@ class GetAttributeScoreDetailUseCaseTest {
     void testGetAttributeScoreDetailUseCaseParam_SortItemNamesShouldNotBeChanged() {
         assertEquals("QUESTIONNAIRE", GetAttributeScoreDetailUseCase.Param.Sort.QUESTIONNAIRE.name());
         assertEquals("WEIGHT", GetAttributeScoreDetailUseCase.Param.Sort.WEIGHT.name());
-        assertEquals("SCORE", GetAttributeScoreDetailUseCase.Param.Sort.SCORE.name());
-        assertEquals("WEIGHTED_SCORE", GetAttributeScoreDetailUseCase.Param.Sort.WEIGHTED_SCORE.name());
+        assertEquals("MISSED_SCORE", GetAttributeScoreDetailUseCase.Param.Sort.MISSED_SCORE.name());
+        assertEquals("GAINED_SCORE", GetAttributeScoreDetailUseCase.Param.Sort.GAINED_SCORE.name());
         assertEquals("CONFIDENCE", GetAttributeScoreDetailUseCase.Param.Sort.CONFIDENCE.name());
         assertEquals("EVIDENCE_COUNT", GetAttributeScoreDetailUseCase.Param.Sort.EVIDENCE_COUNT.name());
     }
@@ -97,8 +97,8 @@ class GetAttributeScoreDetailUseCaseTest {
     void testGetAttributeScoreDetailUseCaseParam_SortItemTitlesShouldNotBeChanged() {
         assertEquals("questionnaire", GetAttributeScoreDetailUseCase.Param.Sort.QUESTIONNAIRE.getTitle());
         assertEquals("weight", GetAttributeScoreDetailUseCase.Param.Sort.WEIGHT.getTitle());
-        assertEquals("score", GetAttributeScoreDetailUseCase.Param.Sort.SCORE.getTitle());
-        assertEquals("weightedScore", GetAttributeScoreDetailUseCase.Param.Sort.WEIGHTED_SCORE.getTitle());
+        assertEquals("missedScore", GetAttributeScoreDetailUseCase.Param.Sort.MISSED_SCORE.getTitle());
+        assertEquals("gainedScore", GetAttributeScoreDetailUseCase.Param.Sort.GAINED_SCORE.getTitle());
         assertEquals("confidence", GetAttributeScoreDetailUseCase.Param.Sort.CONFIDENCE.getTitle());
         assertEquals("evidenceCount", GetAttributeScoreDetailUseCase.Param.Sort.EVIDENCE_COUNT.getTitle());
     }
