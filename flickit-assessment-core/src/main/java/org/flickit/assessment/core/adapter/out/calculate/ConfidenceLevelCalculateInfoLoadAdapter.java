@@ -289,7 +289,7 @@ public class ConfidenceLevelCalculateInfoLoadAdapter implements LoadConfidenceLe
      * @return assessment with all information needed for calculation
      */
     private Assessment buildAssessment(AssessmentJpaEntity assessmentEntity, long kitVersionId) {
-        AssessmentKit kit = new AssessmentKit(assessmentEntity.getAssessmentKitId(), null, kitVersionId, null, null);
+        AssessmentKit kit = new AssessmentKit(assessmentEntity.getAssessmentKitId(), null, kitVersionId, null, null, null);
         return mapToDomainModel(assessmentEntity, kit, null);
     }
 }

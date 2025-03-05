@@ -19,6 +19,8 @@ public interface AssessmentJpaRepository extends JpaRepository<AssessmentJpaEnti
 
     Optional<AssessmentJpaEntity> findByIdAndDeletedFalse(UUID id);
 
+    int countBySpaceIdAndDeletedFalse(long spaceId);
+
     @Query("""
             SELECT
                 a as assessment,

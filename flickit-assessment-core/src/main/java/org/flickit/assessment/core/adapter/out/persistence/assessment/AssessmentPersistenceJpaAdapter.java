@@ -43,7 +43,8 @@ public class AssessmentPersistenceJpaAdapter implements
     GetAssessmentProgressPort,
     LoadAssessmentPort,
     DeleteAssessmentPort,
-    CheckAssessmentSpaceMembershipPort {
+    CheckAssessmentSpaceMembershipPort,
+    CountAssessmentsPort {
 
     private final AssessmentJpaRepository repository;
     private final AssessmentResultJpaRepository resultRepository;
@@ -241,5 +242,10 @@ public class AssessmentPersistenceJpaAdapter implements
     @Override
     public boolean isAssessmentSpaceMember(UUID assessmentId, UUID userId) {
         return repository.checkIsAssessmentSpaceMember(assessmentId, userId).isPresent();
+    }
+
+    @Override
+    public int countSpaceAssessments(long spaceId) {
+        return repository.countBySpaceIdAndDeletedFalse(spaceId);
     }
 }

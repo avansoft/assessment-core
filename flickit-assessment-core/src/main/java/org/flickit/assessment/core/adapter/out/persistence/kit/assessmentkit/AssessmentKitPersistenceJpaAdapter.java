@@ -2,10 +2,8 @@ package org.flickit.assessment.core.adapter.out.persistence.kit.assessmentkit;
 
 import lombok.RequiredArgsConstructor;
 import org.flickit.assessment.common.exception.ResourceNotFoundException;
-import org.flickit.assessment.core.application.port.out.assessmentkit.CheckKitAccessPort;
-import org.flickit.assessment.core.application.port.out.assessmentkit.LoadAssessmentKitVersionIdPort;
-import org.flickit.assessment.core.application.port.out.assessmentkit.LoadKitLastMajorModificationTimePort;
-import org.flickit.assessment.core.application.port.out.assessmentkit.LoadKitInfoPort;
+import org.flickit.assessment.core.application.domain.AssessmentKit;
+import org.flickit.assessment.core.application.port.out.assessmentkit.*;
 import org.flickit.assessment.data.jpa.kit.assessmentkit.AssessmentKitJpaEntity;
 import org.flickit.assessment.data.jpa.kit.assessmentkit.AssessmentKitJpaRepository;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,8 @@ public class AssessmentKitPersistenceJpaAdapter implements
     LoadKitLastMajorModificationTimePort,
     LoadAssessmentKitVersionIdPort,
     CheckKitAccessPort,
-    LoadKitInfoPort {
+    LoadKitInfoPort,
+    LoadAssessmentKitPort {
 
     private final AssessmentKitJpaRepository repository;
 
@@ -48,5 +47,13 @@ public class AssessmentKitPersistenceJpaAdapter implements
             .orElseThrow(() -> new ResourceNotFoundException(ASSESSMENT_KIT_ID_NOT_FOUND));
 
         return new Result(kitEntity.getTitle(), kitEntity.getCreatedBy(), kitEntity.getExpertGroupId());
+    }
+
+    @Override
+    public AssessmentKit loadAssessmentKit(long kitId) {
+        var entity = repository.findById(kitId)
+            .orElseThrow(() -> new ResourceNotFoundException(ASSESSMENT_KIT_ID_NOT_FOUND));
+
+        return AssessmentKitMapper.mapToDomainModel(entity, null);
     }
 }

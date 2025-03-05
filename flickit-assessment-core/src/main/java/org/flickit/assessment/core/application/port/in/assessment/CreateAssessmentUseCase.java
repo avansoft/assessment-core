@@ -3,6 +3,7 @@ package org.flickit.assessment.core.application.port.in.assessment;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.flickit.assessment.common.application.SelfValidating;
@@ -40,6 +41,7 @@ public interface CreateAssessmentUseCase {
         @NotNull(message = COMMON_CURRENT_USER_ID_NOT_NULL)
         UUID currentUserId;
 
+        @Builder
         public Param(Long spaceId, String title, String shortTitle, Long kitId, UUID currentUserId) {
             this.title = title != null ? title.strip() : null;
             this.shortTitle = shortTitle != null && !shortTitle.isBlank() ? shortTitle.strip() : null;

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.flickit.assessment.common.error.ErrorMessageKey.COMMON_CURRENT_USER_ID_NOT_NULL;
@@ -16,74 +17,64 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class CreateAssessmentUseCaseParamTest {
 
     @Test
-    void tesCreateAssessmentUseCaseParam_TitleIsNull_ErrorMessage() {
-        UUID currentUserId = UUID.randomUUID();
+    void testCreateAssessmentUseCaseParam_TitleParamViolatesConstraints_ErrorMessage() {
         var throwable = assertThrows(ConstraintViolationException.class,
-            () -> new CreateAssessmentUseCase.Param(0L, null, "shortTitle", 1L, currentUserId));
+            () -> createParam(b -> b.title(null)));
         assertThat(throwable).hasMessage("title: " + CREATE_ASSESSMENT_TITLE_NOT_BLANK);
-    }
-
-    @Test
-    void tesCreateAssessmentUseCaseParam_TitleIsShort_ErrorMessage() {
-        UUID currentUserId = UUID.randomUUID();
-        var throwable = assertThrows(ConstraintViolationException.class,
-            () -> new CreateAssessmentUseCase.Param(0L, "hi", "shortTitle",1L, currentUserId));
+        throwable = assertThrows(ConstraintViolationException.class,
+            () -> createParam(b -> b.title("a")));
         assertThat(throwable).hasMessage("title: " + CREATE_ASSESSMENT_TITLE_SIZE_MIN);
-    }
-
-    @Test
-    void tesCreateAssessmentUseCaseParam_TitleIsLong_ErrorMessage() {
-        UUID currentUserId = UUID.randomUUID();
-        var title = RandomStringUtils.random(101, true, true);
-        var throwable = assertThrows(ConstraintViolationException.class,
-            () -> new CreateAssessmentUseCase.Param(0L, title, "shortTitle", 1L, currentUserId));
+        throwable = assertThrows(ConstraintViolationException.class,
+            () -> createParam(b -> b.title(RandomStringUtils.random(101, true, true))));
         assertThat(throwable).hasMessage("title: " + CREATE_ASSESSMENT_TITLE_SIZE_MAX);
     }
 
     @Test
-    void tesCreateAssessmentUseCaseParam_ShortTitleIsLessThanMin_ErrorMessage() {
-        UUID currentUserId = UUID.randomUUID();
+    void testCreateAssessmentUseCaseParam_ShortTitleParamViolatesConstraints_ErrorMessage() {
         var throwable = assertThrows(ConstraintViolationException.class,
-            () -> new CreateAssessmentUseCase.Param(0L, "title", "ab", 1L, currentUserId));
+            () -> createParam(b -> b.shortTitle("a")));
         assertThat(throwable).hasMessage("shortTitle: " + CREATE_ASSESSMENT_SHORT_TITLE_SIZE_MIN);
-    }
-
-    @Test
-    void tesCreateAssessmentUseCaseParam_ShortTitleIsGreaterThanMax_ErrorMessage() {
-        UUID currentUserId = UUID.randomUUID();
-        var shortTitle = RandomStringUtils.random(21, true, true);
-        var throwable = assertThrows(ConstraintViolationException.class,
-            () -> new CreateAssessmentUseCase.Param(0L, "title", shortTitle, 1L, currentUserId));
+        throwable = assertThrows(ConstraintViolationException.class,
+            () -> createParam(b -> b.shortTitle(RandomStringUtils.random(101, true, true))));
         assertThat(throwable).hasMessage("shortTitle: " + CREATE_ASSESSMENT_SHORT_TITLE_SIZE_MAX);
+
+        assertDoesNotThrow(() -> createParam(b -> b.shortTitle(null)));
+        assertDoesNotThrow(() -> createParam(b -> b.shortTitle("          ")));
     }
 
     @Test
-    void testCreateAssessmentUseCaseParam_ShortTitleIsEmptyString_ShouldNotReturnError() {
-        UUID currentUserId = UUID.randomUUID();
-        assertDoesNotThrow(() -> new CreateAssessmentUseCase.Param(0L, "title", "", 1L, currentUserId));
-        assertDoesNotThrow(() -> new CreateAssessmentUseCase.Param(0L, "title", "            ", 1L, currentUserId));
-    }
-
-    @Test
-    void tesCreateAssessmentUseCaseParam_SpaceIdIsNull_ErrorMessage() {
-        UUID currentUserId = UUID.randomUUID();
+    void testCreateAssessmentUseCaseParam_SpaceIdParamViolatesConstraints_ErrorMessage() {
         var throwable = assertThrows(ConstraintViolationException.class,
-            () -> new CreateAssessmentUseCase.Param(null, "title", "shortTitle", 1L, currentUserId));
+            () -> createParam(b -> b.spaceId(null)));
         assertThat(throwable).hasMessage("spaceId: " + CREATE_ASSESSMENT_SPACE_ID_NOT_NULL);
     }
 
     @Test
-    void tesCreateAssessmentUseCaseParam_KitIdIsNull_ErrorMessage() {
-        UUID currentUserId = UUID.randomUUID();
+    void testCreateAssessmentUseCaseParam_KitIdParamViolatesConstraints_ErrorMessage() {
         var throwable = assertThrows(ConstraintViolationException.class,
-            () -> new CreateAssessmentUseCase.Param(0L, "title", "shortTitle", null, currentUserId));
+            () -> createParam(b -> b.kitId(null)));
         assertThat(throwable).hasMessage("kitId: " + CREATE_ASSESSMENT_ASSESSMENT_KIT_ID_NOT_NULL);
     }
 
     @Test
-    void tesCreateAssessmentUseCaseParam_CurrentUserIdIsNull_ErrorMessage() {
+    void testCreateAssessmentUseCaseParam_currentUserIdParamViolatesConstraint_ErrorMessage() {
         var throwable = assertThrows(ConstraintViolationException.class,
-            () -> new CreateAssessmentUseCase.Param(0L, "title", "shortTitle", 1L, null));
+            () -> createParam(b -> b.currentUserId(null)));
         assertThat(throwable).hasMessage("currentUserId: " + COMMON_CURRENT_USER_ID_NOT_NULL);
+    }
+
+    private void createParam(Consumer<CreateAssessmentUseCase.Param.ParamBuilder> changer) {
+        var paramBuilder = paramBuilder();
+        changer.accept(paramBuilder);
+        paramBuilder.build();
+    }
+
+    private CreateAssessmentUseCase.Param.ParamBuilder paramBuilder() {
+        return CreateAssessmentUseCase.Param.builder()
+            .title("title")
+            .shortTitle("shortTitle")
+            .spaceId(0L)
+            .kitId(1L)
+            .currentUserId(UUID.randomUUID());
     }
 }

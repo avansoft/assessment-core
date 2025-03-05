@@ -15,4 +15,5 @@ public class AssessmentKit {
     private final Long kitVersion;
     private final KitLanguage language;
     private final List<MaturityLevel> maturityLevels;
+    private final Boolean isPrivate;
 }

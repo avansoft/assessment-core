@@ -311,7 +311,7 @@ public class AssessmentCalculateInfoLoadAdapter implements LoadCalculateInfoPort
     private Assessment buildAssessment(AssessmentJpaEntity assessmentEntity, long kitVersionId) {
         Long kitId = assessmentEntity.getAssessmentKitId();
         List<MaturityLevel> maturityLevels = maturityLevelJpaAdapter.loadByKitVersionIdWithCompetences(kitVersionId);
-        AssessmentKit kit = new AssessmentKit(kitId, null, kitVersionId, null, maturityLevels);
+        AssessmentKit kit = new AssessmentKit(kitId, null, kitVersionId, null, maturityLevels, null);
         return mapToDomainModel(assessmentEntity, kit, null);
     }
 
