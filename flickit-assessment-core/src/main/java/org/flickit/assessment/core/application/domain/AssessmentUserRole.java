@@ -109,7 +109,8 @@ public enum AssessmentUserRole {
             APPROVE_ANSWER,
             APPROVE_ALL_ASSESSMENT_INSIGHTS,
             GENERATE_ALL_ASSESSMENT_INSIGHTS,
-            RESOLVE_ALL_COMMENTS)),
+            RESOLVE_ALL_COMMENTS,
+            APPROVE_ALL_ANSWERS)),
         MANAGER_PERMISSIONS(Set.of(
             CREATE_ASSESSMENT,
             DELETE_ASSESSMENT,

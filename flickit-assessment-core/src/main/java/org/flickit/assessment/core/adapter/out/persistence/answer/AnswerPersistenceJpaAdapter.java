@@ -134,4 +134,12 @@ public class AnswerPersistenceJpaAdapter implements
     public void approve(UUID answerId, UUID approvedBy) {
         repository.approve(answerId, approvedBy, AnswerStatus.APPROVED.getId());
     }
+
+    @Override
+    public void approveAll(UUID assessmentId, UUID approvedBy) {
+        var assessmentResult = assessmentResultRepo.findFirstByAssessment_IdOrderByLastModificationTimeDesc(assessmentId)
+            .orElseThrow(() -> new ResourceNotFoundException(ASSESSMENT_ID_NOT_FOUND));
+
+        repository.approveByAssessmentResultId(assessmentResult.getId(), approvedBy, AnswerStatus.APPROVED.getId());
+    }
 }

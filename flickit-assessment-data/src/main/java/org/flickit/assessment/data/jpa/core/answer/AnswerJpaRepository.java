@@ -124,4 +124,16 @@ public interface AnswerJpaRepository extends JpaRepository<AnswerJpaEntity, UUID
     List<AnswersQuestionnaireAndCountView> countQuestionnairesUnapprovedAnswers(@Param("assessmentResultId") UUID assessmentResultId,
                                                                                 @Param("questionnaireIds") Set<Long> questionnaireIds,
                                                                                 @Param("status") Integer status);
+
+    @Modifying
+    @Query("""
+            UPDATE AnswerJpaEntity a
+                SET a.status = :status,
+                    a.lastModifiedBy = :lastModifiedBy
+            WHERE a.assessmentResult.id = :assessmentResultId
+                AND (a.answerOptionId IS NOT NULL OR a.isNotApplicable = true)
+        """)
+    void approveByAssessmentResultId(@Param("assessmentResultId") UUID assessmentResultId,
+                                     @Param("lastModifiedBy") UUID lastModifiedBy,
+                                     @Param("status") Integer status);
 }

@@ -340,4 +340,6 @@ public class ErrorMessageKey {
     public static final String RESOLVE_ASSESSMENT_COMMENTS_ASSESSMENT_ID_NOT_NULL = "resolve-assessment-comments.assessmentId.notNull";
 
     public static final String GET_ASSESSMENT_INSIGHTS_ASSESSMENT_ID_NOT_NULL = "get-assessment-insights.assessmentId.notNull";
+
+    public static final String APPROVE_ASSESSMENT_ANSWERS_ASSESSMENT_ID_NOT_NULL = "approve-assessment-answers.assessmentId.notNull";
 }
