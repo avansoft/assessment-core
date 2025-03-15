@@ -5,8 +5,10 @@ import org.flickit.assessment.common.application.domain.assessment.AssessmentAcc
 import org.flickit.assessment.common.application.domain.crud.Order;
 import org.flickit.assessment.common.application.domain.crud.PaginatedResponse;
 import org.flickit.assessment.common.exception.AccessDeniedException;
+import org.flickit.assessment.common.util.MathUtils;
 import org.flickit.assessment.core.application.port.in.attribute.GetAttributeScoreDetailUseCase;
 import org.flickit.assessment.core.application.port.out.attribute.LoadAttributeScoreDetailPort;
+import org.flickit.assessment.core.application.port.out.attribute.LoadAttributeScoresPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +24,17 @@ public class GetAttributeScoreDetailService implements GetAttributeScoreDetailUs
 
     private final LoadAttributeScoreDetailPort loadAttributeScoreDetailPort;
     private final AssessmentAccessChecker assessmentAccessChecker;
+    private final LoadAttributeScoresPort loadAttributeScoresPort;
 
     @Override
     public PaginatedResponse<Result> getAttributeScoreDetail(Param param) {
         checkUserAccess(param.getAssessmentId(), param.getCurrentUserId());
+
+        var stats = loadAttributeScoresPort.loadScores(param.getAssessmentId(), param.getAttributeId(), param.getMaturityLevelId());
+        double maxPossibleScore = stats.stream()
+            .filter(result -> !Boolean.TRUE.equals(result.answerIsNotApplicable()))
+            .mapToDouble(LoadAttributeScoresPort.Result::questionWeight)
+            .sum();
 
         var result = loadAttributeScoreDetailPort.loadScoreDetail(
             toParam(
@@ -39,7 +48,10 @@ public class GetAttributeScoreDetailService implements GetAttributeScoreDetailUs
             )
         );
 
-        var items = result.getItems().stream().map(this::toResult).toList();
+        var items = result.getItems().stream()
+            .map(i -> toResult(i, maxPossibleScore))
+            .toList();
+
         return new PaginatedResponse<>(items,
             result.getPage(),
             result.getSize(),
@@ -64,10 +76,23 @@ public class GetAttributeScoreDetailService implements GetAttributeScoreDetailUs
             page);
     }
 
-    private Result toResult(LoadAttributeScoreDetailPort.Result item) {
+    private Result toResult(LoadAttributeScoreDetailPort.Result item, double maxPossibleScore) {
+        Double gainedScore = item.gainedScore();
+        Double missedScore = item.missedScore();
+        Double gainedScorePercentage = calculatePercentage(gainedScore, maxPossibleScore);
+        Double missedScorePercentage = calculatePercentage(missedScore, maxPossibleScore);
+
         return new Result(
             new Result.Questionnaire(item.questionnaireId(), item.questionnaireTitle()),
             new Result.Question(item.questionId(), item.questionIndex(), item.questionTitle(), item.questionWeight(), item.evidenceCount()),
-            new Result.Answer(item.optionIndex(), item.optionTitle(), item.answerIsNotApplicable(), item.gainedScore(), item.missedScore(), item.confidence()));
+            new Result.Answer(gainedScore, missedScore, gainedScorePercentage, missedScorePercentage, item.confidence())
+        );
+    }
+
+    private Double calculatePercentage(Double score, double maxPossibleScore) {
+        if (score == null || maxPossibleScore <= 0) {
+            return null;
+        }
+        return MathUtils.round((score / maxPossibleScore) * 100, 2);
     }
 }

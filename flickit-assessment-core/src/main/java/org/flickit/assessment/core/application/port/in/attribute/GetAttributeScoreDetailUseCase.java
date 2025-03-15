@@ -86,11 +86,10 @@ public interface GetAttributeScoreDetailUseCase {
         public record Question(long id, int index, String title, int weight, int evidenceCount) {
         }
 
-        public record Answer(Integer index,
-                             String title,
-                             Boolean isNotApplicable,
-                             Double gainedScore,
+        public record Answer(Double gainedScore,
                              Double missedScore,
+                             Double gainedScorePercentage,
+                             Double missedScorePercentage,
                              Integer confidenceLevel) {
         }
     }
