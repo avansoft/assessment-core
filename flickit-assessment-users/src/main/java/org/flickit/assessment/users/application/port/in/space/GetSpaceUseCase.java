@@ -37,6 +37,7 @@ public interface GetSpaceUseCase {
     record Result(Space space,
                   boolean editable,
                   int membersCount,
-                  int assessmentsCount) {
+                  int assessmentsCount,
+                  boolean canCreateAssessment) {
     }
 }

@@ -1,5 +1,6 @@
 package org.flickit.assessment.users.application.service.space;
 
+import org.flickit.assessment.common.config.AppSpecProperties;
 import org.flickit.assessment.common.exception.AccessDeniedException;
 import org.flickit.assessment.common.exception.ResourceNotFoundException;
 import org.flickit.assessment.users.application.port.in.space.GetSpaceUseCase;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
@@ -18,22 +20,25 @@ import static org.flickit.assessment.common.error.ErrorMessageKey.COMMON_CURRENT
 import static org.flickit.assessment.users.common.ErrorMessageKey.SPACE_ID_NOT_FOUND;
 import static org.flickit.assessment.users.test.fixture.application.SpaceMother.basicSpace;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GetSpaceServiceTest {
 
     @InjectMocks
-    GetSpaceService service;
+    private GetSpaceService service;
 
     @Mock
-    CheckSpaceAccessPort checkSpaceAccessPort;
+    private CheckSpaceAccessPort checkSpaceAccessPort;
 
     @Mock
-    LoadSpaceDetailsPort loadSpaceDetailsPort;
+    private LoadSpaceDetailsPort loadSpaceDetailsPort;
+
+    @Spy
+    private AppSpecProperties appSpecProperties = appSpecProperties();
 
     private final GetSpaceUseCase.Param param = createParam(GetSpaceUseCase.Param.ParamBuilder::build);
+    private final int maxBasicAssessments = 2;
 
     @Test
     void testGetSpace_whenCurrentUserIsNotASpaceMember_thenThrowAccessDeniedException() {
@@ -42,7 +47,7 @@ class GetSpaceServiceTest {
         var throwable = assertThrows(AccessDeniedException.class, () -> service.getSpace(param));
         assertEquals(COMMON_CURRENT_USER_NOT_ALLOWED, throwable.getMessage());
 
-        verifyNoInteractions(loadSpaceDetailsPort);
+        verifyNoInteractions(loadSpaceDetailsPort, appSpecProperties);
     }
 
     @Test
@@ -53,12 +58,14 @@ class GetSpaceServiceTest {
 
         var throwable = assertThrows(ResourceNotFoundException.class, () -> service.getSpace(param));
         assertEquals(SPACE_ID_NOT_FOUND, throwable.getMessage());
+
+        verifyNoInteractions(appSpecProperties);
     }
 
     @Test
     void testGetSpace_whenCurrentUserIsSpaceOwner_thenReturnSpaceWithEditableTrue() {
         var space = basicSpace(param.getCurrentUserId());
-        var portResult = new LoadSpaceDetailsPort.Result(space, 1, 2);
+        var portResult = new LoadSpaceDetailsPort.Result(space, 1, maxBasicAssessments-1);
 
         when(checkSpaceAccessPort.checkIsMember(param.getId(), param.getCurrentUserId())).thenReturn(true);
         when(loadSpaceDetailsPort.loadSpace(param.getId())).thenReturn(portResult);
@@ -74,12 +81,13 @@ class GetSpaceServiceTest {
         assertEquals(portResult.space().getLastModificationTime(), result.space().getLastModificationTime());
         assertEquals(portResult.membersCount(), result.membersCount());
         assertEquals(portResult.assessmentsCount(), result.assessmentsCount());
+        assertTrue(result.canCreateAssessment());
     }
 
     @Test
     void testGetSpace_whenCurrentUserIsNotSpaceOwner_thenReturnSpaceWithEditableFalse() {
         var space = basicSpace(UUID.randomUUID());
-        var portResult = new LoadSpaceDetailsPort.Result(space, 1, 2);
+        var portResult = new LoadSpaceDetailsPort.Result(space, 1, maxBasicAssessments);
 
         when(checkSpaceAccessPort.checkIsMember(param.getId(), param.getCurrentUserId())).thenReturn(true);
         when(loadSpaceDetailsPort.loadSpace(param.getId())).thenReturn(portResult);
@@ -95,6 +103,14 @@ class GetSpaceServiceTest {
         assertEquals(portResult.space().getLastModificationTime(), result.space().getLastModificationTime());
         assertEquals(portResult.membersCount(), result.membersCount());
         assertEquals(portResult.assessmentsCount(), result.assessmentsCount());
+        assertFalse(result.canCreateAssessment());
+    }
+
+    private AppSpecProperties appSpecProperties() {
+        var appSpecProperties = new AppSpecProperties();
+        appSpecProperties.setSpace(new AppSpecProperties.Space());
+        appSpecProperties.getSpace().setMaxBasicSpaceAssessments(maxBasicAssessments);
+        return appSpecProperties;
     }
 
     private GetSpaceUseCase.Param createParam(Consumer<GetSpaceUseCase.Param.ParamBuilder> changer) {
